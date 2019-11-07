@@ -1,0 +1,60 @@
+---
+title: "key_points"
+author: "Thiyanga Talagala"
+date: "March 27, 2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+"How to choose the best techniqueor combination of techniques to help solve your particular
+forecasting dilemma" from Manager's guide to forecasting by David M. Georgoff and Robert G. Murdick. A large and fastgrowing body of research deals with the development,
+refinement, and evaluation of forecast techniques
+
+Selecting a most appropriate forecast model or a combination of models to use in forecasting is a challenging task. Such problems typically lack algebraic expressions, it is not possible to calculate derivative information, and the problem may exhibit uncertainty or noise. Expert knowledge is required. Even with the necessary knowledge and skills, success is not quaranteed. 
+
+since prior expert knowledge is often expensive, not always readily available, and subject to bias and personal preferences, metalearning can serve as a promising complement to this form of advice through the automatic accumulation of experience based on the performance of multiple applications of a learning system.
+
+Reid (1972) was among the first to argue that the relative accuracy of
+forecasting methods changes according to the properties of the time
+series (Evidence for the Selection of Forecasting Methods by NIGEL MEADE).
+
+- Comparison with the previous frameworks we have developed
+
+1. Feature-based FORecast Model Selection (FFORMS): poses the problem as a classification problem using the random forest algorithm. The model output is the "best" forecasting method.
+
+2. Feature-based FORecast Model Averaging (FFORMA): poses the problem as a average forecast error minimization problem using the extreme gradient boosting approach. The output is a vector of weights assigns to each forecast-model.
+
+3. \textcolor{red}{Feature-based FORecast Model Performance Prediction (FFORMPP)} [tentative name]: poses the problem as a multivariate regression problem in which we try to predict forecast-error of each method. The main difference compared to our previous approaches is the output, Y, is vector, which means we predict the performances of several forecasting methods simultaneously by taking the correlation structure into account. These statistics are used as explanatory variables in predicting the relative performance of the nine methods using a set of simulated time series with known properties. These results are evaluated on observed data sets, the M-Competition data and Fildes Telecommunications data. The
+general conclusion is that the summary statistics can be used to select a good forecasting method (or set of methods) but not necessarily the best.
+
+Rather than mapping a dataset to a single predictive
+model, one may also produce a ranking over a set of different models. One
+can argue that such rankings are more flexible and informative for users. In a
+practical scenario, users should not be limited to a single kind of advice; this is
+important if the suggested final model turns unsatisfactory. Rankings provide
+alternative solutions to users who may wish to incorporate their own expertise or
+any other criterion (e.g., financial constraints) on their decision-making process.
+
+
+Enables us to select one or more strategies that seem effective given the characteristics of the dataset under analysis.
+
+
+- simulate time series using MAR models
+
+quality of the predictions normally improves with an increasing number of scenarios or examples.
+
+It has been widely accepted that gathering additional training data typically leads to an improvement in performance of predictive models(paper: Cross-domain Meta-learning for Time-series Forecasting).
+
+Additionally, in a real-world environment it is common for frequent changes to the time series portfolio as new relevant time series are added to the system and other nolonger relevant time series are removed from the system. Randomly generated test instances lack diversity and rarely resemble real-world instances. 
+
+- use additional data from other domains, but doesn't guarantee that it will cover the entire space
+
+- This paper in this series
+
+- The forecasting chart can help the manager select the best combination of techniques.
+ 
+We first use random forest algorithms to predict the forecast-model that is expected to perform best on a given time series. This is known as the algorithm selection problem, and can be expressed formally using Rice's framework for algorithm selection. We then applied xgboost algorithm to
