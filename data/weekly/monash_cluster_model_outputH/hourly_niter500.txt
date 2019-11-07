@@ -1,0 +1,91 @@
+
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Model specifications: with 500 iterations, without making transformations to features
+> #----------------------------------------------------------------------------------------
+> ## ---- setup
+> rm(list = ls())
+> gc()
+         used (Mb) gc trigger (Mb) max used (Mb)
+Ncells 256190 13.7     627480 33.6   418014 22.4
+Vcells 445432  3.4    8388608 64.0  1759038 13.5
+> 
+> ## ---- pkg
+> library(tidyverse)
+> library(methods)
+> library(MASS)
+> library(Matrix)
+> library(mvtnorm)
+> library(flutils)
+> library(movingknots)
+> library(fformpp)
+> 
+> ## ---- data
+> # #on laptop
+> # load("data/hourly/hourly_training_fformpp/hourly_features_training_fformpp.rda")
+> # hourly_training_fformpp_mat <- as.matrix(hourly_features_training_fformpp)
+> # load("data/hourly/hourly_training_fformpp/hourly_mase_fformpp.rda")
+> 
+> # on Monash Cluster
+> load("Beijing/hourly_features_training_fformpp.rda")
+> hourly_training_fformpp_mat <- as.matrix(hourly_features_training_fformpp)[,c(1:22, 24:26)]
+> load("Beijing/hourly_mase_fformpp.rda")
+> hourly_mase_fformpp <- hourly_mase_fformpp
+> 
+> ## ----fit surface regression models
+> n <- dim(hourly_mase_fformpp)[1]
+> p <- dim(hourly_mase_fformpp)[2] 
+> 
+> hourly_niter500 <- fit_fformpp(feamat=hourly_training_fformpp_mat,
++                                 accmat=hourly_mase_fformpp, 
++                                 sknots = 2, aknots = 2,  # arguments for surface and additive splines
++                                 fix.s = 0, fix.a = 0,  # fix parameters, 0 means all are updated
++                                 fix.shrinkage=1:p, # shrinkages for covaiates are not updated
++                                 fix.covariance = 0, 
++                                 fix.coefficients = 0,
++                                 n.iter = 500,
++                                 knot.moving.algorithm = "Random-Walk",
++                                 ptype = c("X'X", "X'X", "X'X"), 
++                                 prior.knots=n)
+Updating Knots, Shrinkages, and Covariance >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Posterior acceptance probabilities(%) in 1/1 cross-validation:
+----------------------------------------------------------------------
+       Done(%)|        knots(1)        knots(2)        knots(3)        knots(4)        knots(5)        knots(6)        knots(7)        knots(8)        knots(9)       knots(10)       knots(11)       knots(12)       knots(13)       knots(14)       knots(15)       knots(16)       knots(17)       knots(18)       knots(19)       knots(20)       knots(21)       knots(22)       knots(23)       knots(24)   shrinkages(1) coefficients(1)   covariance(1) 
+           10 |           36.04           23.35           17.13           26.61           37.66           25.35           40.47           28.65           26.47           40.61           29.23           28.78           28.98           24.07           22.46           51.61           28.46           36.28           32.93           31.43               6              10            8.29              20               0              NA               0 
+           20 |           22.17            19.2           12.57           19.05           32.37            24.8           31.42            24.2            20.1           24.75            25.5           24.79           24.14           21.34            23.9           36.65           23.64           29.42           34.12           33.55               3               7            5.14           12.38               0              NA               0 
+           30 |           18.11           17.11           11.79           14.91           29.17            22.9           24.78           21.99            16.7           20.08           21.16            24.3           16.99           17.18           22.77           28.91            18.2           25.21           27.42           30.49            2.67            4.67            4.76            9.63               0              NA               0 
+           40 |           14.69           15.04           10.14           12.68           24.24           20.01           23.16           22.55           14.49            18.6           19.39           22.48           15.82           17.21           20.78           23.58            19.4           24.43           23.92           30.82             2.5               4            4.07            7.72               0              NA               0 
+           50 |           15.07           14.12             9.1           12.35           22.39           20.23           21.62           21.31           16.05           17.28           18.76           20.01           15.09           16.93           21.23           22.61           17.93            23.4           24.86           29.17               2             3.2            3.26            6.18               0              NA               0 
+           60 |           13.63            14.1            9.21            11.5            19.8            20.2           20.09            20.2           15.41           18.05           18.56            19.8           15.19           17.11           18.78           21.62           17.82            22.6           23.44           27.61            1.67            2.67            2.95            5.48               0              NA               0 
+           70 |           11.97           12.77            8.18           10.21           18.41              19           18.71           20.16           14.36           16.93            18.3           19.92           13.26           15.58           16.38           19.01           16.21           20.84           22.35           26.64            1.43            2.29            2.53             5.5               0              NA               0 
+           80 |            11.5           12.61            7.91             9.7           17.34           17.73           17.82           19.02           14.24           16.13           17.23           18.77           12.47           15.28           15.92           17.54           14.94           19.82           22.12           26.37            1.25               2            2.71            4.81               0              NA               0 
+           90 |           11.75           12.55            8.67            9.71           17.36            18.6           18.37              19           15.44           16.61            18.3           19.91           12.65           15.37           15.97            16.5           15.45           19.85           22.51           26.67            1.11            1.78            2.41            4.72               0              NA               0 
+          100 |           12.09           13.03             8.1            9.21           18.07           19.16            18.7           18.84           15.08           15.92           18.16           20.83           13.08           15.88           16.62            16.3           15.32           19.64           21.81           27.53             1.2             1.6            2.17            4.25               0              NA               0 
+----------------------------------------------------------------------
+
+Updating Coefficients >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Updating LPDS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+LPDS: NA ( n.se: NA ) 
+
+> save(hourly_niter500, file="Beijing/hourly_niter500.rda")
+> 
+ 50)

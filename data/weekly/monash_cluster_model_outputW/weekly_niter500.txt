@@ -1,0 +1,91 @@
+
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # Model specifications: with 5000 iterations, without making transformations to features
+> #----------------------------------------------------------------------------------------
+> ## ---- setup
+> rm(list = ls())
+> gc()
+         used (Mb) gc trigger (Mb) max used (Mb)
+Ncells 256190 13.7     627480 33.6   418014 22.4
+Vcells 445432  3.4    8388608 64.0  1759038 13.5
+> 
+> ## ---- pkg
+> library(tidyverse)
+> library(methods)
+> library(MASS)
+> library(Matrix)
+> library(mvtnorm)
+> library(flutils)
+> library(movingknots)
+> library(fformpp)
+> 
+> ## ---- data
+> # #on laptop
+> # load("data/weekly/weekly_training_fformpp/weekly_features_training_fformpp.rda")
+> # weekly_training_fformpp_mat <- as.matrix(weekly_features_training_fformpp)
+> # load("data/weekly/weekly_training_fformpp/weekly_mase_fformpp.rda")
+> 
+> # on Monash Cluster
+> load("Beijing/weekly_features_training_fformpp.rda")
+> weekly_training_fformpp_mat <- as.matrix(weekly_features_training_fformpp)
+> load("Beijing/weekly_mase_fformpp.rda")
+> 
+> 
+> ## ----fit surface regression models
+> n <- dim(weekly_mase_fformpp)[1]
+> p <- dim(weekly_mase_fformpp)[2] 
+> 
+> weekly_niter500 <- fit_fformpp(feamat=weekly_training_fformpp_mat,
++                                 accmat=weekly_mase_fformpp, 
++                                 sknots = 2, aknots = 2,  # arguments for surface and additive splines
++                                 fix.s = 0, fix.a = 0,  # fix parameters, 0 means all are updated
++                                 fix.shrinkage=1:p, # shrinkages for covaiates are not updated
++                                 fix.covariance = 0, 
++                                 fix.coefficients = 0,
++                                 n.iter = 500,
++                                 knot.moving.algorithm = "Random-Walk",
++                                 ptype = c("identity", "identity", "identity"), 
++                                 prior.knots=n)
+Updating Knots, Shrinkages, and Covariance >>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Posterior acceptance probabilities(%) in 1/1 cross-validation:
+----------------------------------------------------------------------
+       Done(%)|        knots(1)        knots(2)        knots(3)        knots(4)        knots(5)        knots(6)        knots(7)        knots(8)        knots(9)       knots(10)       knots(11)       knots(12)       knots(13)       knots(14)       knots(15)       knots(16)       knots(17)       knots(18)       knots(19)       knots(20)       knots(21)       knots(22)       knots(23)       knots(24)   shrinkages(1) coefficients(1)   covariance(1) 
+           10 |           40.89           32.15           36.16           31.86           49.58           41.23           35.82           41.61           45.24           41.26            45.1           37.85           31.41           38.02           38.14           37.51           48.05           42.61           42.86           50.45              10               6            18.9              10               0              NA               0 
+           20 |           33.87           29.48           26.92           27.45           38.81           39.69           29.29           39.53            34.3           32.24           28.57           31.68           28.76           31.19           35.81           33.77           40.87           42.19           47.01           42.88               5               3           10.45            5.89               0              NA               0 
+           30 |            30.8           27.58           20.79           24.92           34.54           39.44           26.18           36.45           29.35           30.58           22.24           28.37           26.11           28.14           33.62           31.06           39.26           40.92           44.38           39.18            3.33               2            10.3             4.6               0              NA               0 
+           40 |           28.25           29.05           21.03            23.7           36.26           37.29           24.73           36.55           26.37           31.43           21.16           26.24           24.92           29.96           30.62            30.1           38.74            40.1           42.13            38.4            3.94             1.5           10.23            3.95               0              NA               0 
+           50 |           27.65           28.14           17.62           20.74           33.97           32.97           23.46           34.71           24.72           30.07           21.17           24.18           22.33           27.81           28.66           30.53           36.61           41.53              42           37.27            3.55             1.2            9.39            3.16               0              NA               0 
+           60 |           26.56              29           15.97           19.58            33.7           33.26           23.55           35.98           24.72           28.38           21.53           23.52           21.79            26.4           28.54           32.34           34.78           40.99           40.72           36.38            3.63               1            8.97            2.63               0              NA               0 
+           70 |           25.86           28.31           16.09           19.33            33.4           31.73            24.2           33.86           23.67           25.92           21.11           22.82           21.45           24.58           30.22           32.14           33.69           38.24           39.84           35.72            3.11            0.86            7.69            2.26               0              NA               0 
+           80 |           25.26           28.75           15.75           18.54           32.97           30.85            24.5           33.44           23.21           25.71           20.44           22.43           21.06           25.14           30.49           32.06           33.91            37.2           39.02           34.33            2.72            0.75            6.72            1.97               0              NA               0 
+           90 |            25.8           27.99           16.31           18.05           33.93           31.02           24.31           31.72           23.82           25.95           19.74           21.84           20.16           24.45           31.83           31.18           33.86           35.56           38.34           35.34            2.42            0.67            5.98            1.75               0              NA               0 
+          100 |           25.98           27.75           15.63           17.92           33.37            31.2           24.37           30.51           22.49           26.05           19.63           21.28           20.47           23.52           31.26            31.3           34.37           34.83           36.65           34.84            2.18             0.6            5.38            1.58               0              NA               0 
+----------------------------------------------------------------------
+
+Updating Coefficients >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+Updating LPDS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+LPDS: NA ( n.se: NA ) 
+
+> save(weekly_niter500, file="Beijing/weekly_niter500.rda")
+> 
+ 50)
